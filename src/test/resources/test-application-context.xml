@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+                           http://www.springframework.org/schema/context
+                           http://www.springframework.org/schema/context/spring-context-3.2.xsd
+                           http://www.springframework.org/schema/tx
+                           http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+                           http://www.springframework.org/schema/data/jpa
+                           http://www.springframework.org/schema/data/jpa/spring-jpa.xsd">
+
+    <context:annotation-config/>
+    <context:component-scan base-package="ru.juja.sqlcmd_ee2"/>
+    <jpa:repositories base-package="com.juja.sqlcmd_ee2.dao.repository"
+                      entity-manager-factory-ref="emf"/>
+
+    <bean id="emf"
+          class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+        <property name="packagesToScan" value="com.juja.sqlcmd_ee2.dao.entity" />
+        <property name="dataSource" ref="logDataSource" />
+
+        <property name="jpaProperties">
+            <props>
+                <prop key="hibernate.show_sql">true</prop>
+                <prop key="hibernate.hbm2ddl.auto">validate</prop>
+                <prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+            </props>
+        </property>
+
+        <property name="persistenceProvider">
+            <bean class="org.hibernate.jpa.HibernatePersistenceProvider"/>
+        </property>
+    </bean>
+
+    <tx:annotation-driven transaction-manager="transactionManager" />
+
+    <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+        <property name="dataSource" ref="logDataSource" />
+    </bean>
+
+    <bean id="service" class="com.juja.sqlcmd_ee2.service.ServiceImpl">
+        <property name="commands">
+            <list>
+                <value>connect</value>
+                <value>create-table</value>
+                <value>tables</value>
+                <value>create-database</value>
+                <value>delete-database</value>
+            </list>
+        </property>
+        <lookup-method name="getManager" bean="postgreDatabaseManager"/>
+    </bean>
+
+
+    <bean id="logDataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+        <property name="driverClassName" value="${log.jdbc.driverClassName}"/>
+        <property name="url" value="${log.jdbc.url}"/>
+        <property name="username" value="${log.jdbc.username}"/>
+        <property name="password" value="${log.jdbc.password}"/>
+    </bean>
+
+    <context:property-placeholder location="classpath:log.jdbc.properties"/>
+</beans>
