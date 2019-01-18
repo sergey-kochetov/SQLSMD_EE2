@@ -3,7 +3,7 @@ package com.juja.sqlcmd_ee2;
 
 public class DatabaseLogin {
 
-    String database = "sqlsmd";
+    String database = "sqlcmd_ee2";
     String user = "postgres";
     String password = "postgres";
 

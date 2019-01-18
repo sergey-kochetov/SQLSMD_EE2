@@ -25,7 +25,7 @@ public class DatabasePreparation {
     }
 
     private void connectDatabase() throws DatabaseException {
-        manager.connect("sqlsmd", "postgres", "postgres");
+        manager.connect("sqlcmd_ee2", "postgres", "postgres");
     }
 
     private void createFirstTable() throws DatabaseException {

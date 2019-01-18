@@ -5,7 +5,7 @@
          xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
          version="2.4">
 
-    <display-name>sqlcmd</display-name>
+    <display-name>sqlcmd_ee2</display-name>
     <context-param>
         <param-name>contextConfigLocation</param-name>
         <param-value>/WEB-INF/application-context.xml</param-value>
@@ -29,4 +29,4 @@
         <url-pattern>/</url-pattern>
     </servlet-mapping>
 
-    </web-app>
+</web-app>

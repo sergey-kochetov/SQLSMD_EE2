@@ -22,7 +22,7 @@ public class IntegrationTest {
 
     @Before
     public void prepare() {
-        setBaseUrl("http://localhost:8080/sqlsmd");
+        setBaseUrl("http://localhost:8080/sqlsmd_ee2");
         beginAt("/connect");
         setTextField("database", login.getDatabase());
         setTextField("user", login.getUser());
