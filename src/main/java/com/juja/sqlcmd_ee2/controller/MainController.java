@@ -13,14 +13,12 @@ import com.juja.sqlcmd_ee2.dao.databasemanager.DatabaseManager;
 import com.juja.sqlcmd_ee2.service.Service;
 
 import javax.servlet.http.HttpSession;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Controller
 @Scope("session")
 public class MainController {
+
     @Autowired
     private Service service;
 
@@ -45,7 +43,8 @@ public class MainController {
                              @RequestParam(value = "user") String user,
                              @RequestParam(value = "password") String password) {
         try {
-            session.setAttribute("manager", service.connect(database, user, password));
+            DatabaseManager connect = service.connect(database, user, password);
+            session.setAttribute("manager", connect);
             return "redirect:menu";
         } catch (Exception e) {
             return error(model, e);
@@ -55,7 +54,8 @@ public class MainController {
     @RequestMapping(value = "/tables", method = RequestMethod.GET)
     public String tableNames(Model model, HttpSession session) {
         try {
-            model.addAttribute("list", service.getTableNames(getManager(session)));
+            Set<String> tableNames = service.getTableNames(getManager(session));
+            model.addAttribute("list", tableNames);
             return "tables";
         } catch (Exception e) {
             return error(model, e);
@@ -75,8 +75,7 @@ public class MainController {
         }
     }
 
-    @RequestMapping(value = "tables/{tableName}/clear-table",
-            method = RequestMethod.GET)
+    @RequestMapping(value = "tables/{tableName}/clear-table", method = RequestMethod.GET)
     public String clearTable(Model model, HttpSession session,
                              @PathVariable(value = "tableName") String tableName) {
         try {
@@ -88,14 +87,12 @@ public class MainController {
         }
     }
 
-    @RequestMapping(value = "tables/{tableName}/delete-record",
-            method = RequestMethod.GET)
+    @RequestMapping(value = "tables/{tableName}/delete-record", method = RequestMethod.GET)
     public String deleteRecord() {
         return "delete-record";
     }
 
-    @RequestMapping(value = "tables/{tableName}/delete-record",
-            method = RequestMethod.POST)
+    @RequestMapping(value = "tables/{tableName}/delete-record", method = RequestMethod.POST)
     public String deletingRecord(Model model, HttpSession session,
                                  @PathVariable(value = "tableName") String tableName,
                                  @RequestParam(value = "keyValue") String keyValue) {
@@ -109,8 +106,7 @@ public class MainController {
         }
     }
 
-    @RequestMapping(value = "tables/{tableName}/create-record",
-            method = RequestMethod.GET)
+    @RequestMapping(value = "tables/{tableName}/create-record", method = RequestMethod.GET)
     public String createRecord(Model model, HttpSession session,
                                @PathVariable(value = "tableName") String tableName) {
         try {
@@ -122,8 +118,7 @@ public class MainController {
         }
     }
 
-    @RequestMapping(value = "tables/{tableName}/create-record",
-            method = RequestMethod.POST)
+    @RequestMapping(value = "tables/{tableName}/create-record", method = RequestMethod.POST)
     public String creatingRecord(Model model, HttpSession session,
                                  @PathVariable(value = "tableName") String tableName,
                                  @RequestParam Map<String, Object> allRequestParams) {
@@ -136,8 +131,7 @@ public class MainController {
         }
     }
 
-    @RequestMapping(value = "tables/{tableName}/delete-table",
-            method = RequestMethod.GET)
+    @RequestMapping(value = "tables/{tableName}/delete-table", method = RequestMethod.GET)
     public String deleteTable(Model model, HttpSession session,
                               @PathVariable(value = "tableName") String tableName) {
         try {
@@ -149,16 +143,14 @@ public class MainController {
         }
     }
 
-    @RequestMapping(value = {"/create-database", "/delete-database"},
-            method = RequestMethod.GET)
+    @RequestMapping(value = {"/create-database", "/delete-database"}, method = RequestMethod.GET)
     public String databaseName() {
         return "database-name";
     }
 
     @RequestMapping(value = "/delete-database", method = RequestMethod.POST)
     public String deleteDatabase(Model model, HttpSession session,
-                                 @RequestParam(value = "databaseName")
-                                         String databaseName) {
+                                 @RequestParam(value = "databaseName") String databaseName) {
         try {
             DatabaseManager manager = getManager(session);
             service.dropBase(manager, databaseName);
@@ -170,8 +162,7 @@ public class MainController {
 
     @RequestMapping(value = "/create-database", method = RequestMethod.POST)
     public String createDatabase(Model model, HttpSession session,
-                                 @RequestParam(value = "databaseName")
-                                         String databaseName) {
+                                 @RequestParam(value = "databaseName") String databaseName) {
         try {
             DatabaseManager manager = getManager(session);
             service.createBase(manager, databaseName);
@@ -194,8 +185,7 @@ public class MainController {
         }
     }
 
-    @RequestMapping(value = "tables/{tableName}/update-record",
-            method = RequestMethod.POST)
+    @RequestMapping(value = "tables/{tableName}/update-record", method = RequestMethod.POST)
     public String updatingRecord(Model model, HttpSession session,
                                  @PathVariable(value = "tableName") String tableName,
                                  @RequestParam Map<String, Object> allRequestParams) {
@@ -247,11 +237,10 @@ public class MainController {
         return "actions";
     }
 
-    private Map<String, Object> getColumnParameters(@RequestParam Map<String, String>
-                                                            allRequestParams) {
+    private Map<String, Object> getColumnParameters(@RequestParam Map<String, String> allRequestParams) {
         Map<String, Object> data = new LinkedHashMap<>();
-        Iterator<Map.Entry<String, String>> iterator;
-        iterator = allRequestParams.entrySet().iterator();
+        Iterator<Map.Entry<String, String>> iterator = allRequestParams.entrySet().iterator();
+
         while (iterator.hasNext()) {
             Map.Entry<String, String> pair = iterator.next();
             String key = pair.getValue();

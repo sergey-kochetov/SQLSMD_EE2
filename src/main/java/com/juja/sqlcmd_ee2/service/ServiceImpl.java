@@ -53,7 +53,7 @@ public abstract class ServiceImpl implements Service {
         List<List<String>> tableData = manager.getTableData(tableName);
         List<String> columnNames = manager.getColumnNames(tableName);
         tableData.add(0, columnNames);
-        userAction.saveAction("GET TABLE ( " + tableName + " )",
+        userAction.saveAction(String.format("GET TABLE ( %s )", tableName),
                 manager.getUser(), manager.getDatabase());
         return tableData;
     }
@@ -62,7 +62,7 @@ public abstract class ServiceImpl implements Service {
     public void createTable(DatabaseManager manager, String tableName, String keyName,
                             Map<String, Object> columnParameters) {
         manager.createTable(tableName, keyName, columnParameters);
-        userAction.saveAction("CREATE TABLE ( " + tableName + " )",
+        userAction.saveAction(String.format("CREATE TABLE ( %s )", tableName),
                 manager.getUser(), manager.getDatabase());
     }
 
@@ -70,7 +70,7 @@ public abstract class ServiceImpl implements Service {
     public void createRecord(DatabaseManager manager, String tableName,
                              Map<String, Object> columnData) {
         manager.createRecord(tableName, columnData);
-        userAction.saveAction("CREATE RECORD IN TABLE ( " + tableName + " )",
+        userAction.saveAction(String.format("CREATE RECORD IN TABLE ( %s )", tableName),
                 manager.getUser(), manager.getDatabase());
     }
 
@@ -79,7 +79,7 @@ public abstract class ServiceImpl implements Service {
                              String keyName, String keyValue,
                              Map<String, Object> columnData) {
         manager.updateRecord(tableName, keyName, keyValue, columnData);
-        userAction.saveAction("UPDATE RECORD IN TABLE ( " + tableName + " ) KEY = " + keyValue,
+        userAction.saveAction(String.format("UPDATE RECORD IN TABLE ( %s ) KEY = %s", tableName, keyValue),
                 manager.getUser(), manager.getDatabase());
     }
 
@@ -87,35 +87,35 @@ public abstract class ServiceImpl implements Service {
     public void deleteRecord(DatabaseManager manager, String tableName,
                              String keyName, String keyValue) {
         manager.deleteRecord(tableName, keyName, keyValue);
-        userAction.saveAction("DELETE RECORD IN TABLE ( " + tableName + " ) KEY = " + keyValue,
+        userAction.saveAction(String.format("DELETE RECORD IN TABLE ( %s ) KEY = %s", tableName, keyValue),
                 manager.getUser(), manager.getDatabase());
     }
 
     @Override
     public void clearTable(DatabaseManager manager, String tableName) {
         manager.clearTable(tableName);
-        userAction.saveAction("CLEAR TABLE ( " + tableName + " )",
+        userAction.saveAction(String.format("CLEAR TABLE ( %s )", tableName),
                 manager.getUser(), manager.getDatabase());
     }
 
     @Override
     public void dropTable(DatabaseManager manager, String tableName) {
         manager.dropTable(tableName);
-        userAction.saveAction("DELETE TABLE ( " + tableName + " )",
+        userAction.saveAction(String.format("DELETE TABLE ( %s )", tableName),
                 manager.getUser(), manager.getDatabase());
     }
 
     @Override
     public void createBase(DatabaseManager manager, String database) {
         manager.createBase(database);
-        userAction.saveAction("CREATE DATABASE ( " + database + " )",
+        userAction.saveAction(String.format("CREATE DATABASE ( %s )", database),
                 manager.getUser(), manager.getDatabase());
     }
 
     @Override
     public void dropBase(DatabaseManager manager, String database) {
         manager.dropBase(database);
-        userAction.saveAction("DELETE DATABASE ( " + database + " )",
+        userAction.saveAction(String.format("DELETE DATABASE ( %s )", database),
                 manager.getUser(), manager.getDatabase());
     }
 

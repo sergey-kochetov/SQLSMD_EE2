@@ -22,25 +22,17 @@ public class PostgreDatabaseManager implements DatabaseManager {
     @Override
     public void connect(String database, String user, String password)
             throws DatabaseException {
+        this.user = user;
+        this.database = database;
         try {
-            Class.forName("org.postgresql.Driver");
-            if (connection != null) {
-                connection.close();
-                template = null;
-            }
+            closeConnection();
             connection = DriverManager.getConnection(
-                    JDBC_POSTGRESQL_URL + database + "", "" + user + "",
-                    "" + password + "");
+                    JDBC_POSTGRESQL_URL + database, user, password);
             DataSource dataSource = new SingleConnectionDataSource(connection, false);
             template = new JdbcTemplate(dataSource);
-            this.user = user;
-            this.database = database;
         } catch (SQLException e) {
             throw new DatabaseException("Can't connect to database. " +
                     e.getMessage(), e);
-        } catch (ClassNotFoundException e) {
-            throw new DatabaseException("Can't find driver jar. Add it to project. "
-                    + e.getMessage(), e);
         }
     }
 
@@ -52,34 +44,19 @@ public class PostgreDatabaseManager implements DatabaseManager {
                 tableName, keyName, getParameters(columnParameters)));
     }
 
-    private String getParameters(Map<String, Object> columnParameters) {
-        StringBuilder url = new StringBuilder(4);
-        for (Map.Entry<String, Object> pair : columnParameters.entrySet()) {
-            url.append(", ")
-                    .append(pair.getKey())
-                    .append(" ")
-                    .append(pair.getValue());
-        }
-        return url.toString();
-    }
-
     @Override
     public Set<String> getTableNames() {
         return new LinkedHashSet<>(template.query(
                 "SELECT table_name FROM information_schema.tables " +
                         "WHERE table_schema = 'public'",
-                (rs, rowNum) -> {
-                    return rs.getString("table_name");
-                }));
+                (rs, rowNum) -> rs.getString("table_name")));
     }
 
     @Override
     public List<String> getColumnNames(String tableName) {
         return template.query(String.format("SELECT * FROM information_schema.columns " +
                         "WHERE table_schema = 'public' AND table_name = '%s'", tableName),
-                (resultSet, rowNum) -> {
-                    return resultSet.getString("column_name");
-                });
+                (resultSet, rowNum) -> resultSet.getString("column_name"));
     }
 
     @Override
@@ -166,5 +143,25 @@ public class PostgreDatabaseManager implements DatabaseManager {
     @Override
     public String getDatabase() {
         return database;
+    }
+
+    private String getParameters(Map<String, Object> columnParameters) {
+        StringBuilder url = new StringBuilder(4);
+        for (Map.Entry<String, Object> pair : columnParameters.entrySet()) {
+            url.append(", ")
+                    .append(pair.getKey())
+                    .append(" ")
+                    .append(pair.getValue());
+        }
+        return url.toString();
+    }
+
+    private void closeConnection() throws SQLException {
+        if (connection != null) {
+            connection.close();
+            template = null;
+            connection = null;
+        }
+
     }
 }

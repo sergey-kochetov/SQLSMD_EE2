@@ -22,7 +22,7 @@ ALTER TABLE database_connection
 
 ALTER TABLE user_actions ADD COLUMN database_connection_id integer;
 
-ALTER TABLE user_actions DROP CONSTRAINT user_action_database_connection_fk;
+--ALTER TABLE user_actions DROP CONSTRAINT user_action_database_connection_fk;
 
 ALTER TABLE user_actions
   ADD CONSTRAINT user_action_database_connection_fk FOREIGN KEY (database_connection_id)
